@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070d1c">
+<title>لوحة المعلم — METALS FOOTBALL CHAMPIONSHIP</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+ body{overflow:auto;position:static}
+ html{overflow:auto}
+ #h-panel{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;padding:12px;min-height:100vh}
+ @media(max-width:980px){#h-panel{grid-template-columns:1fr}}
+ .stage{position:relative;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line);min-height:420px;height:min(66vh,640px)}
+ .stage canvas#field{position:absolute;inset:0;width:100%;height:100%}
+ .stage.full{position:fixed;inset:0;z-index:50;height:auto;border-radius:0}
+ .side{display:flex;flex-direction:column;gap:12px}
+ .pinbox{text-align:center}
+ .pinbox .pin{font-size:clamp(40px,7vw,64px);font-weight:900;letter-spacing:10px;color:var(--gold);direction:ltr;line-height:1.1;margin:2px 0 6px}
+ .linkrow{display:flex;gap:6px;align-items:center;direction:ltr}
+ .linkrow input{flex:1;min-width:0;padding:8px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font-size:13px;direction:ltr}
+ .ctl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .ctl .btn{padding:11px 8px;font-size:16px}
+ .ctl .wide{grid-column:1/-1}
+ select.field{padding:9px;font-size:16px;text-align:center}
+ .slist{max-height:34vh;overflow:auto;display:flex;flex-direction:column;gap:5px}
+ .srow{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:rgba(255,255,255,.06);font-weight:700;font-size:15px}
+ .srow .on{width:9px;height:9px;border-radius:50%;background:#555}.srow .on.y{background:var(--green)}
+ .srow .tn{margin-inline-start:auto;font-size:12px;padding:2px 8px;border-radius:99px}
+ .srow .tn.t0{background:var(--t0)}.srow .tn.t1{background:var(--t1)}.srow .tn.tx{background:#444}
+ .srow button{background:transparent;color:var(--red);font-size:16px;padding:0 4px}
+ .hscore{display:flex;justify-content:center;align-items:center;gap:16px;direction:ltr;font-size:clamp(30px,5vw,48px);font-weight:900}
+ .hscore small{font-size:14px;direction:rtl;font-weight:700;padding:3px 10px;border-radius:99px}
+ .stage .qread{position:absolute;inset:auto 12px 12px 12px;z-index:11;background:rgba(6,12,30,.92);border:2px solid rgba(255,210,63,.6);border-radius:16px;padding:12px 16px}
+ .stage .qread .t{font-weight:900;font-size:clamp(16px,2.4vw,24px);margin:4px 0 8px}
+ .stage .qread .o{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:clamp(13px,1.8vw,18px);font-weight:700}
+ .stage .qread .o div{padding:6px 10px;border-radius:9px;background:rgba(255,255,255,.07);border:2px solid transparent}
+ .stage .qread .o div.right{border-color:var(--green);background:rgba(47,210,119,.25)}
+ .stage .qread .o div.wrong{border-color:var(--red);background:rgba(255,84,104,.25)}
+ #hStatus{font-weight:800;text-align:center}
+ .lineupwrap{padding:0}
+</style>
+</head>
+<body>
+
+<div id="h-login" class="screen">
+  <canvas id="bg-host" class="bgfield"></canvas>
+  <h1 class="logo">METALS<br><b>FOOTBALL</b> CHAMPIONSHIP<small>لوحة المعلم — HOST</small></h1>
+  <div class="card col" style="margin-top:14px">
+    <input id="hPwd" class="field hidden" type="password" placeholder="كلمة سر المعلم">
+    <button id="btnCreate" class="btn">➕ إنشاء مباراة جديدة</button>
+    <div id="hErr" class="err"></div>
+    <div class="mut" style="font-size:13px;text-align:center">سيُنشأ رمز PIN من 6 أرقام يدخل به الطلاب من أجهزتهم</div>
+  </div>
+</div>
+
+<div id="h-panel" class="hidden">
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="field"></canvas>
+      <canvas id="lineupCv" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+      <div id="scoreboard" class="hud hidden">
+        <div class="tm a"><span>الأحمر</span></div><div class="sc" id="scA">0</div>
+        <div class="clk"><span id="clk">00:00</span><small id="half">LIVE</small></div>
+        <div class="sc" id="scB">0</div><div class="tm b"><span>الأزرق</span></div>
+      </div>
+      <div id="toast" class="hud"></div>
+      <div id="banner" class="hud"></div>
+      <div id="status-ov" class="hidden"></div>
+      <div id="qread" class="qread hidden"></div>
+      <div id="iconbar" style="left:auto;right:10px;top:8px"><button id="btnMute">🔊</button><button id="btnFs">⛶</button></div>
+    </div>
+    <div id="endArea" class="hidden" style="padding:10px 0"></div>
+  </div>
+
+  <div class="side">
+    <div class="card pinbox">
+      <div class="mut">رمز المباراة PIN</div>
+      <div class="pin" id="hPin">------</div>
+      <div class="linkrow"><input id="hLink" readonly><button class="btn sm sec" id="btnCopy">نسخ</button></div>
+      <div class="mut" style="font-size:12px;margin-top:6px">أرسل الرابط للطلاب — يتضمن الرمز تلقائيًا</div>
+    </div>
+
+    <div class="card">
+      <div class="hscore"><small id="tnA" style="background:var(--t0)">الأحمر</small><span id="hsA">0</span><span>-</span><span id="hsB">0</span><small id="tnB" style="background:var(--t1)">الأزرق</small></div>
+      <div id="hStatus" class="mut" style="margin-top:6px">في الانتظار</div>
+    </div>
+
+    <div class="card">
+      <div class="ctl">
+        <div class="wide"><label class="mut" style="font-size:13px">مدة المباراة</label>
+          <select id="selDur" class="field"><option value="5">5 دقائق</option><option value="10" selected>10 دقائق</option><option value="15">15 دقيقة</option></select></div>
+        <button class="btn green wide" id="btnStart">▶ START MATCH</button>
+        <button class="btn sec" id="btnPause">⏸ إيقاف مؤقت</button>
+        <button class="btn sec" id="btnResume">⏵ استكمال</button>
+        <button class="btn red" id="btnEnd">⏹ إنهاء المباراة</button>
+        <button class="btn sec" id="btnRestart">🔄 إعادة من البداية</button>
+        <button class="btn sec wide" id="btnLobby">↩ العودة لغرفة الانتظار (مباراة جديدة)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>👥 الطلاب</b><span class="pill" id="hCount">0</span></div>
+      <div class="slist" id="hList"><div class="mut">لم ينضم أحد بعد…</div></div>
+      <div class="mut" style="font-size:12px;margin-top:8px">الأحمر <b id="hc0">0</b>/11 · الأزرق <b id="hc1">0</b>/11 — يكمل الكمبيوتر الأماكن الناقصة</div>
+    </div>
+  </div>
+</div>
+
+<div id="conn" class="hidden" style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b3261e;text-align:center;padding:6px;font-weight:800">⚠️ انقطع الاتصال… جارٍ إعادة المحاولة</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/render.js"></script>
+<script src="/js/audio.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/host.js"></script>
+</body>
+</html>

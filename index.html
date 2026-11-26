@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#070d1c">
+<title>METALS FOOTBALL CHAMPIONSHIP — دوري الفلزات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- 1) الانضمام -->
+<div id="s-join" class="screen">
+  <canvas id="bg-join" class="bgfield"></canvas>
+  <h1 class="logo">METALS<br><b>FOOTBALL</b> CHAMPIONSHIP<small>دوري الفلزات</small></h1>
+  <div class="card col" style="margin-top:14px">
+    <input id="inName" class="field" maxlength="16" placeholder="اكتب اسمك" autocomplete="off">
+    <input id="inPin" class="field pin" maxlength="6" inputmode="numeric" placeholder="رمز المباراة" autocomplete="off">
+    <button id="btnJoin" class="btn">JOIN MATCH ⚽</button>
+    <div id="joinErr" class="err"></div>
+  </div>
+</div>
+
+<!-- 2) الكرة والجدول الدوري -->
+<div id="s-intro" class="screen hidden">
+  <div style="font-weight:900;font-size:clamp(18px,4vw,28px);text-align:center;margin-bottom:6px">⚽ سدّد الكرة نحو الجدول الدوري لتكتشف عنصرك الفلزي!</div>
+  <div class="mut" id="introHint" style="margin-bottom:8px">اضغط على أي مكان في الجدول (أو اسحب واترك) لتسديد الكرة</div>
+  <canvas id="ptable" style="width:min(1040px,100%);height:min(58vh,520px);border-radius:14px;background:#0a1429;border:1px solid var(--line);touch-action:none"></canvas>
+</div>
+
+<!-- بطاقة العنصر -->
+<div id="elModal" class="screen hidden" style="background:rgba(2,6,18,.82);z-index:30">
+  <div id="elHolder" style="width:100%;display:flex;justify-content:center"></div>
+  <button id="btnElNext" class="btn" style="margin-top:14px">اختيار الفريق ⟵</button>
+</div>
+
+<!-- 3) اختيار الفريق -->
+<div id="s-team" class="screen hidden">
+  <canvas id="bg-team" class="bgfield"></canvas>
+  <h2 class="logo" style="font-size:clamp(22px,5vw,38px)">اختر فريقك</h2>
+  <div class="mut" id="teamName" style="margin-bottom:10px"></div>
+  <div class="teams">
+    <button class="teambtn t0" id="tb0">🔴 الفريق الأحمر<small id="tc0">0 / 11 لاعبًا</small></button>
+    <button class="teambtn t1" id="tb1">🔵 الفريق الأزرق<small id="tc1">0 / 11 لاعبًا</small></button>
+  </div>
+  <div class="err" id="teamErr" style="margin-top:8px"></div>
+</div>
+
+<!-- 4) غرفة الانتظار -->
+<div id="s-lobby" class="screen hidden" style="justify-content:flex-start">
+  <h2 class="logo" style="font-size:clamp(20px,4.5vw,34px);margin-top:6px">تشكيل الفريقين</h2>
+  <canvas id="lineupCv" class="pitchcv"></canvas>
+  <div class="card" style="margin-top:10px;text-align:center;width:min(900px,100%)">
+    <div id="lobbyMsg" style="font-weight:800;font-size:18px">⏳ بانتظار المعلم ليبدأ المباراة…</div>
+    <div class="mut" id="lobbyInfo" style="margin-top:4px"></div>
+    <button class="btn sec sm" id="btnSwitch" style="margin-top:8px">تغيير الفريق</button>
+  </div>
+</div>
+
+<!-- 5) المباراة -->
+<div id="game" class="hidden">
+  <canvas id="field"></canvas>
+  <div id="scoreboard" class="hud">
+    <div class="tm a"><span id="nmA">الأحمر</span></div><div class="sc" id="scA">0</div>
+    <div class="clk"><span id="clk">00:00</span><small id="half">LIVE</small></div>
+    <div class="sc" id="scB">0</div><div class="tm b"><span id="nmB">الأزرق</span></div>
+  </div>
+  <div id="me" class="hud"><div id="meName"></div><div>✅ <b id="meOk">0</b> &nbsp;❌ <b id="meBad">0</b></div></div>
+  <canvas id="radar" class="hud" width="150" height="96"></canvas>
+  <div id="toast" class="hud"></div>
+  <div id="banner" class="hud"></div>
+  <div id="iconbar"><button id="btnMute" title="الصوت">🔊</button><button id="btnFs" title="ملء الشاشة">⛶</button></div>
+  <div id="qpanel" class="hidden"></div>
+  <div id="status-ov" class="hidden"></div>
+  <div class="ctlhint">WASD/الأسهم حركة · Shift جري · Space تمرير · J تسديد · K تمريرة بينية · L تدخل · 🎮 يد التحكم</div>
+  <div id="touch">
+    <div id="joy"><i></i></div>
+    <button id="runbtn">جري</button>
+    <div id="abtns">
+      <button class="ab shoot" data-a="shoot">تسديد</button>
+      <button class="ab pass" data-a="pass">تمرير</button>
+      <button class="ab thru" data-a="through">بينية</button>
+      <button class="ab tack" data-a="tackle">تدخل</button>
+    </div>
+  </div>
+</div>
+
+<!-- 6) نهاية المباراة -->
+<div id="s-end" class="screen hidden" style="justify-content:flex-start;padding-top:20px"></div>
+
+<div id="conn" class="hidden" style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b3261e;text-align:center;padding:6px;font-weight:800">⚠️ انقطع الاتصال… جارٍ إعادة المحاولة</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/render.js"></script>
+<script src="/js/audio.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/student.js"></script>
+</body>
+</html>

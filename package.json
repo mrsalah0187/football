@@ -1,0 +1,13 @@
+{
+  "name": "metals-football-championship",
+  "version": "1.0.0",
+  "description": "لعبة تعليمية جماعية لمراجعة درس الفلزات بأسلوب كرة القدم — المعلم HOST والطلاب من أجهزة مختلفة",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/bots.js"
+  },
+  "engines": { "node": ">=22.5" },
+  "dependencies": { "ws": "^8.18.0" },
+  "license": "MIT"
+}
